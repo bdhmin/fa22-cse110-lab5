@@ -9,6 +9,7 @@ function init() {
   const button = exposeChildren.find(elm => elm.nodeName === 'BUTTON');
   const volumeControls = document.getElementById('volume-controls');
   const horn = {
+    name: '',
     image: exposeChildren.find(elm => elm.nodeName === 'IMG'),
     audio: exposeChildren.find(elm => elm.nodeName === 'AUDIO'),
   }
@@ -16,22 +17,27 @@ function init() {
     range: document.getElementById('volume'),
     icon: Array.from(volumeControls.children).find(elm => elm.nodeName === 'IMG'),
   }
+  const jsConfetti = new JSConfetti();
 
   // Set image and audio file paths when option is selected
   selection.onchange = () => {
-    const valueName = selection.options[selection.selectedIndex].value;
-    horn.image.setAttribute('src', `assets/images/${valueName}.svg`);
-    horn.audio.setAttribute('src', `assets/audio/${valueName}.mp3`);
+    horn.name = selection.options[selection.selectedIndex].value;
+    horn.image.setAttribute('src', `assets/images/${horn.name}.svg`);
+    horn.audio.setAttribute('src', `assets/audio/${horn.name}.mp3`);
   }
 
   // When "Play Sound" button clicked, play audio if available
   button.addEventListener('click', () => {
-    audio.getAttribute('src') !== '' && audio.play();
+    horn.audio.getAttribute('src') !== '' && horn.audio.play();
+    if (horn.name === 'party-horn') {
+      jsConfetti.addConfetti();
+    }
   })
 
   // Volume icon updates as scroll bar changes
   volume.range.oninput = (e) => {
     volume.icon.setAttribute('src', `assets/icons/volume-level-${rangeToLevel(volume.range.value)}.svg`);
+    horn.audio.volume = volume.range.value / 100;
   }
 }
 
